@@ -28,8 +28,9 @@ The source comes with a Makefile with the compilation dependencies, so we have t
 5. In the 'Choose configuration type' dialog, select Program in the list and click OK.
 6. In the 'Edit configuration' dialog, type a convenient name for the custom builder (e.g. 'make'), and type the absolute path to your distribution binary for make (typically /usr/bin/make). 
 7. Set the working directory by clicking Browse Workspace and selecting the folder of the project from the list.
-8. Click OK in the Edit Configuration dialog.
-9. Click OK in the Properties dialog.
+8. In the arguments box, type 'all'.
+9. Click OK in the Edit Configuration dialog.
+10. Click OK in the Properties dialog.
 
 Now the project can be built by selecting Project, Build Project in the menu bar. The customized PlayGame.jar and ShowGame.jar will be generated.
 

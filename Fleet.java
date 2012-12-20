@@ -32,6 +32,8 @@ public class Fleet implements Comparable, Cloneable {
 	this.destinationPlanet = destinationPlanet;
 	this.totalTripLength = totalTripLength;
 	this.turnsRemaining = turnsRemaining;
+	//Change to 0 to make sending of ships instantaneous
+//	this.turnsRemaining = 0; 
     }
 
     // Initializes a fleet.

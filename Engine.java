@@ -193,6 +193,16 @@ public class Engine {
 	    System.out.print(game.FlushGamePlaybackString());
 	    System.out.flush();
 	    game.DoTimeStep();
+	    
+	    //Keep advancing turns, until there are no ships in flight. 
+	    //This way each player has complete knowledge of game state on start
+	    while (game.getFleets().size() != 0) {
+//	    	++numTurns;
+//		    System.err.println("Turn " + numTurns);
+//		    System.out.print(game.FlushGamePlaybackString());
+//		    System.out.flush();
+		    game.skipTimeStep();
+	    }
 	}
 	KillClients(clients);
 	if (game.Winner() > 0) {
@@ -202,4 +212,18 @@ public class Engine {
 	}
 	System.out.println(game.GamePlaybackString());
     }
+    public void WriteLogMessage(String logFilename, String message) {
+    	
+        if (logFilename == null) {
+          return;
+        }
+        try {
+    	  BufferedWriter logFile = new BufferedWriter(new FileWriter(logFilename, true));
+          logFile.write(message);
+          logFile.newLine();
+          logFile.flush();
+        } catch (Exception e) {
+          // whatev
+        }
+      }
 }

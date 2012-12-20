@@ -266,6 +266,42 @@ public class Game implements Cloneable {
   ++numTurns;
     }
 
+    public void skipTimeStep() {
+    	  // Advance all fleets by one time step.
+    	  for (Fleet f : fleets) {
+    	    f.TimeStep();
+    	  }
+    	  // Determine the result of any battles
+    	  for (Planet p : planets) {
+    	    FightBattle(p);
+    	  }
+
+    	  boolean needcomma=false;
+    	  for (Planet p : planets) {
+    	    if(needcomma)
+    	      gamePlayback.append(",");
+    	    gamePlayback.append(p.Owner());
+    	    gamePlayback.append(".");
+    	    gamePlayback.append(p.NumShips());
+    	    needcomma = true;
+    	  }
+    	  for (Fleet f : fleets) {
+    	    if(needcomma)
+    	      gamePlayback.append(",");
+    	    gamePlayback.append(f.Owner());
+    	    gamePlayback.append(".");
+    	    gamePlayback.append(f.NumShips());
+    	    gamePlayback.append(".");
+    	    gamePlayback.append(f.SourcePlanet());
+    	    gamePlayback.append(".");
+    	    gamePlayback.append(f.DestinationPlanet());
+    	    gamePlayback.append(".");
+    	    gamePlayback.append(f.TotalTripLength());
+    	    gamePlayback.append(".");
+    	    gamePlayback.append(f.TurnsRemaining());
+    	  }
+    	  gamePlayback.append(":");
+    }
     // Issue an order. This function takes num_ships off the source_planet,
     // puts them into a newly-created fleet, calculates the distance to the
     // destination_planet, and sets the fleet's total trip time to that
@@ -299,6 +335,7 @@ public class Game implements Cloneable {
                             destinationPlanet,
                             distance,
                             distance);
+        					//5); //for same travel times when sending ship
         fleets.add(f);
         return 0;
     }
@@ -702,4 +739,9 @@ public class Game implements Cloneable {
   public Object clone() {
     return new Game(this);
   }
+  
+  public ArrayList<Fleet> getFleets() {
+	  return this.fleets;
+  }
+  
 }

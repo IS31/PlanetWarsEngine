@@ -26,7 +26,7 @@ public class RenderMap {
                 System.err.println("USAGE: java RenderMap map.txt image.png");
 				System.exit(1);
             }
-            Game game = new Game(args[0], 100, 0);
+            Game game = new Game(args[0], 100, 0, null);
             if (game.Init() == 0) {
                 System.err.println("Error while loading map " + args[0]);
                 System.exit(1);
@@ -59,9 +59,8 @@ public class RenderMap {
 			_g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
 								RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			
-			game.Render(640, 480, 0.0, null, colors, bgColor, textColor,
-						planetFont, fleetFont, _g);
-			
+			//game.Render(640, 480, 0.0, null, colors, bgColor, textColor, planetFont, fleetFont, _g);
+			game.Render(640, 480, 0.0, null, colors,  _g);
             File file = new File(args[1]);
             ImageIO.write(image, "png", file);
         } catch (Exception e) {

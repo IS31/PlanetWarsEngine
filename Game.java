@@ -319,7 +319,7 @@ public class Game implements Cloneable {
     	int numShips = source.NumShips()/2;
         if (source.Owner() != playerID ||
             numShips > source.NumShips() ||
-            numShips < 0) {
+            numShips <= 0) {
             WriteLogMessage("Dropping player " + playerID +
                 ". source.Owner() = " + source.Owner() + ", playerID = " +
                 playerID + ", numShips = " + numShips +

@@ -37,24 +37,30 @@ public class Engine {
 
     public static void main(String[] args) {
 	// Check the command-line arguments.
-	if (args.length < 4 || args.length > 5) {
+	if (args.length != 3 && args.length != 5) {
 	    System.err.println("ERROR: wrong number of command-line " +
 			       "arguments.");
-	    System.err.println("USAGE: engine map_file_name " +
-			       "max_num_turns  player_one " +
-			       "player_two [max_turn_time] ");
+	    System.err.println("USAGE: java -jar PlayGame.jar <map_file_name> " +
+			       "\"java <player_one>\" " +
+			       "\"java <player_two>\" [<max_num_turns> <max_turn_time>] ");
+	    System.err.println("Explanation:");
+	    System.err.println("<map_file_name>: Location of .txt file of map to use for this game");
+	    System.err.println("\"java <player_one>\": Player1. Make sure to add quotes, and add the 'java' part before the bot name. Also make sure your bot is actually compiled (there should be a .class file of your bot file)");
+	    System.err.println("\"java <player_two>\": Idem");
+	    System.err.println("Optional (add both values as argument when deviating from defaults):");
+	    System.err.println("<max_num_turns>: Maximum number of turns this game may take. Default: 100");
+	    System.err.println("<max_turn_time>: Maximum number of time a bot is allowed to take per turn. Default: 100");
 	    System.exit(1);
 	}
 	// Initialize the game. Load the map.
 	String mapFilename = args[0];
-	int maxNumTurns = Integer.parseInt(args[1]);
-	
-	
+	int maxNumTurns = 100;
 	int maxTurnTime = 100; 
 	String logFilename = "log.txt";
 	//optional arguments
 	if (args.length == 5) {
 		maxTurnTime = Integer.parseInt(args[4]);
+		maxNumTurns = Integer.parseInt(args[3]);
 	}
 	Game game = new Game(mapFilename, maxNumTurns, 0, logFilename);
 	if (game.Init() == 0) {
@@ -63,7 +69,7 @@ public class Engine {
 	}
 	// Start the client programs (players).
 	List<Process> clients = new ArrayList<Process>();
-	for (int i = 2; i <= 3; ++i) {
+	for (int i = 1; i <= 2; ++i) {
 	    String command = args[i];
 	    Process client = null;
 	    try {

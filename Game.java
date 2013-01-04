@@ -320,10 +320,22 @@ public class Game implements Cloneable {
         if (source.Owner() != playerID ||
             numShips > source.NumShips() ||
             numShips <= 0) {
+        	
+        	if (source.Owner() != playerID) {
+        		WriteLogMessage("ERROR: cannot send ships from planet you do not own. You lose!");
+        	}
+        	if (numShips > source.NumShips()) {
+        		WriteLogMessage("ERROR: cannot send more ships than you own. You lose!");
+        	}
+        	if (numShips <= 0) {
+        		WriteLogMessage("ERROR: cannot send a negative number of ships. You lose!");
+        	}
             WriteLogMessage("Dropping player " + playerID +
-                ". source.Owner() = " + source.Owner() + ", playerID = " +
-                playerID + ", numShips = " + numShips +
-                ", source.NumShips() = " + source.NumShips());
+                ". source.Owner() = " + source.Owner() + 
+                ", playerID = " + playerID + 
+                ", numShips = " + numShips +
+                ", source.NumShips() = " + source.NumShips() +
+                ", source x/y = " + source.X() + "/" + source.Y());
             DropPlayer(playerID);
             return -1;
         }

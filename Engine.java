@@ -117,10 +117,11 @@ public class Engine {
 	int ap = 0; //MODIFIED: active player, based on current numTurns
 	// Enter the main game loop.
 	while (game.Winner() < 0) {
-	    // Send the game state to the clients.
-	    System.err.println("The game state:");
-	    System.err.print(game);
+	    //System.err.println("The game state:");
+	    //System.err.print(game);
+	    //game.WriteLogMessage("The game state turn " + Integer.toString(numTurns+1) + ":\n" + game.toString());
 	    
+	    // Send the game state to the clients.
 	    if (gameMode == GAME_MODE_SERIAL) {
 	    	//MODIFIED: send game state only to active player (ap)
 	    	if (clients.get(ap) == null || !game.IsAlive(ap + 1)) {
@@ -173,7 +174,7 @@ public class Engine {
                                 String line = buffers[i].toString().trim();
                                 //System.err.println("P" + (i+1) + ": " + line);
                                 line = line.toLowerCase().trim();
-                                System.err.println("player" + (i + 1) + " > engine: " + line);
+                                game.WriteLogMessage("player" + (i + 1) + " > engine: " + line);
                                 // Modified: only process 1 order
                                 game.IssueOrder(i + 1, line);
                                 clientDone[i] = true;
@@ -239,24 +240,6 @@ public class Engine {
 	}
 	System.out.println(game.GamePlaybackString());
 	}
-	
-	
-	
-    public void WriteLogMessage(String logFilename, String message) {
-    	
-        if (logFilename == null) {
-          return;
-        }
-        try {
-    	  BufferedWriter logFile = new BufferedWriter(new FileWriter(logFilename, true));
-          logFile.write(message);
-          logFile.newLine();
-          logFile.flush();
-          logFile.close();
-        } catch (Exception e) {
-          // whatev
-        }
-      }
     
     private static void sendGameState(Game game, List<Process> clients, int clientId) {
     	String message = game.PovRepresentation(clientId + 1) + "go\n";
@@ -265,8 +248,8 @@ public class Engine {
 		    OutputStreamWriter writer = new OutputStreamWriter(out);
 		    writer.write(message, 0, message.length());
 		    writer.flush();
-		    //System.err.println("engine > player" + (ap + 1) + ": " +
-			//		 message);
+		    game.WriteLogMessage("engine > player" + (clientId + 1) + ": " +
+					 message);
 		} catch (Exception e) {
 		    clients.set(clientId, null);
 		}

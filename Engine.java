@@ -82,7 +82,7 @@ public class Engine {
 		String logFilename = "log.txt";
 		int gameMode = GAME_MODE_SERIAL;
 		// optional arguments
-		if (args.length == 4) {
+		if (args.length >= 4) {
 			if (args[3].equalsIgnoreCase(("parallel"))) {
 				gameMode = GAME_MODE_PARALLEL;
 			} else if (args[3].equalsIgnoreCase(("serial"))) {
@@ -93,10 +93,10 @@ public class Engine {
 				System.exit(1);
 			}
 		}
-		if (args.length == 5) {
+		if (args.length >= 5) {
 			maxNumTurns = Integer.parseInt(args[4]);
 		}
-		if (args.length == 6) {
+		if (args.length >= 6) {
 			maxTurnTime = Integer.parseInt(args[5]);
 		}
 
@@ -120,9 +120,7 @@ public class Engine {
 				System.err.println("ERROR: failed to start client: " + command);
 				System.exit(1);
 			}
-			else{
-				System.err.println("Starting " + command  + " -  id: " + clients.size());
-			}
+
 			clients.add(client);
 		}
 		boolean[] isAlive = new boolean[clients.size()];
@@ -130,7 +128,7 @@ public class Engine {
 			isAlive[i] = (clients.get(i) != null);
 		}
 
-		System.err.println("Engine entering main game loop");
+		System.err.println("Engine entering main game loop. Mode "+ gameMode);
 
 		int numTurns = 0;
 		int ap = 0; // MODIFIED: active player, based on current numTurns
@@ -180,7 +178,7 @@ public class Engine {
 				
 				for (int i = 0; i < clients.size(); ++i) {
 
-					if (!isAlive[i] || !game.IsAlive(i + 1) || clientDone[i]) {
+					if (!isAlive[i] || !game.IsAlive((i + 1)%clients.size()) || clientDone[i]) {
 						clientDone[i] = true;
 						continue;
 					}
@@ -202,16 +200,18 @@ public class Engine {
 								// System.err.println("P" + (i+1) + ": " +
 								// line);
 								line = line.toLowerCase().trim();
+								game.WriteLogMessage("player" + (i + 1) + " > engine: " + line);
 								System.err.println("player" + (i + 1)
 										+ " > engine: " + line);
+								System.err.flush();
 								// Modified: only process 1 order
 								game.IssueOrder(i + 1, line);
-								//clientDone[i] = true;
-                                if (line.equals("go")) {
-                                	clientDone[i] = true;
-                                } else {
-                                	game.IssueOrder(i + 1, line);
-                                }
+								clientDone[i] = true;
+//                                if (line.equals("go")) {
+//                                	clientDone[i] = true;
+//                                } else {
+//                                	game.IssueOrder(i + 1, line);
+//                                }
 
 								buffers[i] = new StringBuilder();
 								break;
@@ -232,20 +232,20 @@ public class Engine {
 			// MODIFIED: update active player
 			ap = (ap + 1) % 2;
 
-			for (int j = 0; j < clients.size(); ++j) {
-				if (!isAlive[j] || !game.IsAlive(j + 1)) {
-					continue;
-				}
-				if (clientDone[j]) {
-					continue;
-				}
-				// Do NOT drop players at timeouts
-				/*
-				 * System.err.println("WARNING: player " + (i+1) +
-				 * " timed out."); clients.get(i).destroy(); game.DropPlayer(i +
-				 * 1); isAlive[i] = false;
-				 */
-			}
+//			for (int j = 0; j < clients.size(); ++j) {
+//				if (!isAlive[j] || !game.IsAlive(j + 1)) {
+//					continue;
+//				}
+//				if (clientDone[j]) {
+//					continue;
+//				}
+//				// Do NOT drop players at timeouts
+//				/*
+//				 * System.err.println("WARNING: player " + (i+1) +
+//				 * " timed out."); clients.get(i).destroy(); game.DropPlayer(i +
+//				 * 1); isAlive[i] = false;
+//				 */
+//			}
 			++numTurns;
 			System.err.println("Turn " + numTurns);
 			System.out.print(game.FlushGamePlaybackString());

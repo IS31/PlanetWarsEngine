@@ -180,53 +180,57 @@ public class Engine {
 				
 				for (int i = 0; i < clients.size(); ++i) {
 
-					if (!isAlive[i] || !game.IsAlive((i + 1)%clients.size()) || clientDone[i]) {
-						clientDone[i] = true;
+					int j = (ap + i) % 2; // required to switch between whom to start first (not to favouritize player1)
+					
+					if (!isAlive[j] || !game.IsAlive((j + 1)%clients.size()) || clientDone[j]) {
+						clientDone[j] = true;
 						continue;
 					}
 					
 					// if serial read only the active player
 					if (gameMode == GAME_MODE_SERIAL) {
-						if (i != ap)
+						if (j != ap)
 							continue;
 					}
 					
+					
+					
 					// if it's parallel read both
 					try {
-						InputStream inputStream = clients.get(i)
+						InputStream inputStream = clients.get(j)
 								.getInputStream();
 						while (inputStream.available() > 0) {
 							char c = (char) inputStream.read();
 							if (c == '\n') {
-								String line = buffers[i].toString().trim();
+								String line = buffers[j].toString().trim();
 								// System.err.println("P" + (i+1) + ": " +
 								// line);
 								line = line.toLowerCase().trim();
-								game.WriteLogMessage("player" + (i + 1) + " > engine: " + line);
-								System.err.println("player" + (i + 1)
+								game.WriteLogMessage("player" + (j + 1) + " > engine: " + line);
+								System.err.println("player" + (j + 1)
 										+ " > engine: " + line);
 								System.err.flush();
 								// Modified: only process 1 order
                                 if (line.equals("go")) {
-        							buffers[i] = new StringBuilder();
+        							buffers[j] = new StringBuilder();
                                 } else {
-                                	game.IssueOrder(i + 1, line);
-                                	clientDone[i] = true;
-        							buffers[i] = new StringBuilder();
+                                	game.IssueOrder(j + 1, line);
+                                	clientDone[j] = true;
+        							buffers[j] = new StringBuilder();
     								break;
                                 }
 
 							} else {
-								buffers[i].append(c);
+								buffers[j].append(c);
 							}
 						}
-						printBotDebugOutput(clients, i);
+						printBotDebugOutput(clients, j);
 					} catch (Exception e) {
-						System.err.println("WARNING: player " + (i + 1)
+						System.err.println("WARNING: player " + (j + 1)
 								+ " crashed.");
-						clients.get(i).destroy();
-						game.DropPlayer(i + 1);
-						isAlive[i] = false;
+						clients.get(j).destroy();
+						game.DropPlayer(j + 1);
+						isAlive[j] = false;
 					}
 				}
 			}

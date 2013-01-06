@@ -320,12 +320,27 @@ public class Game implements Cloneable {
         if (source.Owner() != playerID ||
             numShips > source.NumShips() ||
             numShips <= 0) {
+        	
+        	if (source.Owner() != playerID) {
+        		WriteLogMessage("ERROR: cannot send ships from planet you do not own. You lose!");
+        	}
+        	if (numShips > source.NumShips()) {
+        		WriteLogMessage("ERROR: cannot send more ships than you own. You lose!");
+        	}
+        	if (numShips <= 0) {
+        		WriteLogMessage("ERROR: cannot send a negative number of ships. You lose!");
+        	}
             WriteLogMessage("Dropping player " + playerID +
-                ". source.Owner() = " + source.Owner() + ", playerID = " +
-                playerID + ", numShips = " + numShips +
-                ", source.NumShips() = " + source.NumShips());
+                ". source.Owner() = " + source.Owner() + 
+                ", playerID = " + playerID + 
+                ", numShips = " + numShips +
+                ", source.NumShips() = " + source.NumShips() +
+                ", source x/y = " + source.X() + "/" + source.Y());
             DropPlayer(playerID);
             return -1;
+        }
+        if (sourcePlanet == destinationPlanet) {
+        	WriteLogMessage("Source planets same as destination planet.");
         }
         source.RemoveShips(numShips);
         int distance = Distance(sourcePlanet, destinationPlanet);
@@ -377,18 +392,21 @@ public class Game implements Cloneable {
     // Returns true if the named player owns at least one planet or fleet.
     // Otherwise, the player is deemed to be dead and false is returned.
     public boolean IsAlive(int playerID) {
-  for (Planet p : planets) {
-      if (p.Owner() == playerID) {
-    return true;
-      }
-  }
-  for (Fleet f : fleets) {
-      if (f.Owner() == playerID) {
-    return true;
-      }
-  }
-  return false;
-    }
+		for (Planet p : planets) {
+			if (p.Owner() == playerID) {
+				return true;
+			}
+		}
+		for (Fleet f : fleets) {
+			if (f.Owner() == playerID) {
+				return true;
+			}
+		}
+		
+		return false;
+		
+		
+	}
 
     // If the game is not yet over (ie: at least two players have planets or
     // fleets remaining), returns -1. If the game is over (ie: only one player
@@ -742,6 +760,10 @@ public class Game implements Cloneable {
   
   public ArrayList<Fleet> getFleets() {
 	  return this.fleets;
+  }
+  
+  public ArrayList<Planet> getPlanets() {
+	  return this.planets;
   }
   
 }

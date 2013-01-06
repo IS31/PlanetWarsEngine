@@ -31,12 +31,20 @@ public class Engine {
     }
 
     public static boolean AllTrue(boolean[] v) {
-	for (int i = 0; i < v.length; ++i) {
-	    if (!v[i]) {
-		return false;
-	    }
-	}
-	return true;
+		for (int i = 0; i < v.length; ++i) {
+			if (!v[i]) {
+				return false;
+			}
+		}
+		return true;
+    }
+    
+    public static boolean clientsDone(boolean[] clientsDone, int gameMode, int playerId) {
+    	if (gameMode == GAME_MODE_PARALLEL) {
+    		return AllTrue(clientsDone);
+    	} else {
+    		return clientsDone[playerId];
+    	}
     }
 
     public static void main(String[] args) {
@@ -133,20 +141,19 @@ public class Engine {
 		    	if (clients.get(i) == null || !game.IsAlive(i + 1)) {
 				    continue;
 				}
+		    	sendGameState(game, clients, i);
 	    	}
-	    	sendGameState(game, clients, ap);
 	    }
 		
 	    // Get orders from the clients.
 	    StringBuilder[] buffers = new StringBuilder[clients.size()];
 	    boolean[] clientDone = new boolean[clients.size()];
-	    for (int i = 0; i < clients.size(); ++i) {
-		buffers[i] = new StringBuilder();
-		clientDone[i] = false;
-	    }
+		for (int i = 0; i < clients.size(); ++i) {
+			buffers[i] = new StringBuilder();
+			clientDone[i] = false;
+		}
 	    long startTime = System.currentTimeMillis();
-	    while (!AllTrue(clientDone) &&
-		   System.currentTimeMillis() - startTime < maxTurnTime) {
+	    while (!clientsDone(clientDone, gameMode, ap) && System.currentTimeMillis() - startTime < maxTurnTime) {
 	    	
 	    	int i;
 	    	int end;
@@ -159,11 +166,9 @@ public class Engine {
 	    		end = clients.size();
 	    	}
 		for (i = 0 ; i < end; ++i) {
-	    
-	    	
 		    if (!isAlive[i] || !game.IsAlive(i + 1) || clientDone[i]) {
-			clientDone[i] = true;
-			continue;
+		    	clientDone[i] = true;
+		    	continue;
 		    }
                     try {
                         InputStream inputStream =
@@ -175,42 +180,43 @@ public class Engine {
                                 //System.err.println("P" + (i+1) + ": " + line);
                                 line = line.toLowerCase().trim();
                                 game.WriteLogMessage("player" + (i + 1) + " > engine: " + line);
+                                System.err.println("player" + (i + 1) + " > engine: " + line);
                                 // Modified: only process 1 order
                                 game.IssueOrder(i + 1, line);
-                                clientDone[i] = true;
-                                /*
+//                                clientDone[i] = true;
+                                
                                 if (line.equals("go")) {
                                 	clientDone[i] = true;
                                 } else {
                                 	game.IssueOrder(i + 1, line);
                                 }
-                                */
+                                
                                 buffers[i] = new StringBuilder();
                                 break;
                             } else {
                                 buffers[i].append(c);
                             }
                         }
-                        receiveOrders(clients, i);
+                        printBotDebugOutput(clients, i);
                     } catch (Exception e) {
-			System.err.println("WARNING: player " + (i+1) +
-					   " crashed.");
-			clients.get(i).destroy();
-			game.DropPlayer(i + 1);
-			isAlive[i] = false;
+						System.err.println("WARNING: player " + (i+1) +
+								   " crashed.");
+						clients.get(i).destroy();
+						game.DropPlayer(i + 1);
+						isAlive[i] = false;
 		    }
 		}
 		}
 	    //MODIFIED: update active player
 	    ap = (ap + 1)%2;
 	   
-	    for (int j = 0 ; j < clients.size(); ++j) {
-		if (!isAlive[j] || !game.IsAlive(j + 1)) {
-		    continue;
-		}
-		if (clientDone[j]) {
-		    continue;
-		}
+		for (int j = 0; j < clients.size(); ++j) {
+			if (!isAlive[j] || !game.IsAlive(j + 1)) {
+				continue;
+			}
+			if (clientDone[j]) {
+				continue;
+			}
 		// Do NOT drop players at timeouts
 		/*
 		System.err.println("WARNING: player " + (i+1) +
@@ -255,7 +261,7 @@ public class Engine {
 		}
     }
     
-    private static void receiveOrders(List<Process> clients, int clientId) throws IOException {
+    private static void printBotDebugOutput(List<Process> clients, int clientId) throws IOException {
     	StringBuilder buf = new StringBuilder();
         InputStream stderr = clients.get(clientId).getErrorStream();
         while (stderr.available() > 0){

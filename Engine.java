@@ -39,205 +39,223 @@ public class Engine {
 	return true;
     }
 
-    public static void main(String[] args) {
-	// Check the command-line arguments.
-	if (args.length < 3 || args.length > 6) {
-	    System.err.println("ERROR: wrong number of command-line " +
-			       "arguments.");
-	    System.err.println("USAGE: java -jar PlayGame.jar <map_file_name> " +
-			       "\"java <player_one>\" " +
-			       "\"java <player_two>\" [<game_mode>] [<max_num_turns>] [<max_turn_time>] ");
-	    System.err.println("");
-	    System.err.println("Explanation:");
-	    System.err.println("<map_file_name>:        Location of .txt file of map to use for this game");
-	    System.err.println("\"java <player_one>\":  Player1. Make sure to add quotes, and add the 'java' part before the bot name. Also make sure your bot is actually compiled (there should be a .class file of your bot file)");
-	    System.err.println("\"java <player_two>\":  Idem");
-	    System.err.println("Optional:");
-	    
-	    System.err.println("<game_mode>:            Game mode to run in. Options are: 'parallel' and 'serial'. Serial (used in week 1) means for each turn, first player1 makes a move, and then player2. Parallel (used in week2) means for every turn, each player makes a move at the same time. Default: serial");
-	    System.err.println("<max_num_turns>:        Maximum number of turns this game may take. Default: 100");
-	    System.err.println("<max_turn_time>:        Maximum number of time a bot is allowed to take per turn. Default: 100");
-	    System.exit(1);
-	}
-	// Initialize the game. Load the map.
-	String mapFilename = args[0];
-	int maxNumTurns = 100;
-	int maxTurnTime = 100; 
-	String logFilename = "log.txt";
-	int gameMode = GAME_MODE_SERIAL;
-	//optional arguments
-	if (args.length == 4) {
-		if (args[3].equalsIgnoreCase(("parallel"))) {
-			gameMode = GAME_MODE_PARALLEL;
-		} else if (args[3].equalsIgnoreCase(("serial"))) {
-			gameMode = GAME_MODE_SERIAL;
-		} else {
-			System.err.println("The 4th argument is unknown. This should either be 'parallel' or 'serial'");
+	public static void main(String[] args) {
+		// Check the command-line arguments.
+		if (args.length < 3 || args.length > 6) {
+			System.err.println("ERROR: wrong number of command-line "
+					+ "arguments.");
+			System.err
+					.println("USAGE: java -jar PlayGame.jar <map_file_name> "
+							+ "\"java <player_one>\" "
+							+ "\"java <player_two>\" [<game_mode>] [<max_num_turns>] [<max_turn_time>] ");
+			System.err.println("");
+			System.err.println("Explanation:");
+			System.err
+					.println("<map_file_name>:        Location of .txt file of map to use for this game");
+			System.err
+					.println("\"java <player_one>\":  Player1. Make sure to add quotes, and add the 'java' part before the bot name. Also make sure your bot is actually compiled (there should be a .class file of your bot file)");
+			System.err.println("\"java <player_two>\":  Idem");
+			System.err.println("Optional:");
+
+			System.err
+					.println("<game_mode>:            Game mode to run in. Options are: 'parallel' and 'serial'. Serial (used in week 1) means for each turn, first player1 makes a move, and then player2. Parallel (used in week2) means for every turn, each player makes a move at the same time. Default: serial");
+			System.err
+					.println("<max_num_turns>:        Maximum number of turns this game may take. Default: 100");
+			System.err
+					.println("<max_turn_time>:        Maximum number of time a bot is allowed to take per turn. Default: 100");
 			System.exit(1);
 		}
-	}
-	if (args.length == 5) {
-		maxNumTurns = Integer.parseInt(args[4]);
-	}
-	if (args.length == 6) {
-		maxTurnTime = Integer.parseInt(args[5]);
-	}
-	
-	Game game = new Game(mapFilename, maxNumTurns, 0, logFilename);
-	if (game.Init() == 0) {
-	    System.err.println("ERROR: failed to start game. map: " +
-			       mapFilename);
-	}
-	// Start the client programs (players).
-	List<Process> clients = new ArrayList<Process>();
-	for (int i = 1; i <= 2; ++i) {
-	    String command = args[i];
-	    Process client = null;
-	    try {
-		client = Runtime.getRuntime().exec(command);
-	    } catch (Exception e) {
-		client = null;
-	    }
-	    if (client == null) {
-		KillClients(clients);
-		System.err.println("ERROR: failed to start client: " +
-				   command);
-		System.exit(1);
-	    }
-	    clients.add(client);
-	}
-	boolean[] isAlive = new boolean[clients.size()];
-	for (int i = 0; i < clients.size(); ++i) {
-	    isAlive[i] = (clients.get(i) != null);
-	}
-	
-	System.err.println("Engine entering main game loop");
-	
-	int numTurns = 0;
-	int ap = 0; //MODIFIED: active player, based on current numTurns
-	// Enter the main game loop.
-	while (game.Winner() < 0) {
-	    // Send the game state to the clients.
-	    System.err.println("The game state:");
-	    System.err.print(game);
-	    
-	    if (gameMode == GAME_MODE_SERIAL) {
-	    	//MODIFIED: send game state only to active player (ap)
-	    	if (clients.get(ap) == null || !game.IsAlive(ap + 1)) {
-			    continue;
+		// Initialize the game. Load the map.
+		String mapFilename = args[0];
+		int maxNumTurns = 100;
+		int maxTurnTime = 100;
+		String logFilename = "log.txt";
+		int gameMode = GAME_MODE_SERIAL;
+		// optional arguments
+		if (args.length == 4) {
+			if (args[3].equalsIgnoreCase(("parallel"))) {
+				gameMode = GAME_MODE_PARALLEL;
+			} else if (args[3].equalsIgnoreCase(("serial"))) {
+				gameMode = GAME_MODE_SERIAL;
+			} else {
+				System.err
+						.println("The 4th argument is unknown. This should either be 'parallel' or 'serial'");
+				System.exit(1);
 			}
-	    	sendGameState(game, clients, ap);
-	    } else {
-	    	for (int i = 0; i < clients.size(); ++i) {
-		    	if (clients.get(i) == null || !game.IsAlive(i + 1)) {
-				    continue;
+		}
+		if (args.length == 5) {
+			maxNumTurns = Integer.parseInt(args[4]);
+		}
+		if (args.length == 6) {
+			maxTurnTime = Integer.parseInt(args[5]);
+		}
+
+		Game game = new Game(mapFilename, maxNumTurns, 0, logFilename);
+		if (game.Init() == 0) {
+			System.err.println("ERROR: failed to start game. map: "
+					+ mapFilename);
+		}
+		// Start the client programs (players).
+		List<Process> clients = new ArrayList<Process>();
+		for (int i = 1; i <= 2; ++i) {
+			String command = args[i];
+			Process client = null;
+			try {
+				client = Runtime.getRuntime().exec(command);
+			} catch (Exception e) {
+				client = null;
+			}
+			if (client == null) {
+				KillClients(clients);
+				System.err.println("ERROR: failed to start client: " + command);
+				System.exit(1);
+			}
+			else{
+				System.err.println("Starting " + command  + " -  id: " + clients.size());
+			}
+			clients.add(client);
+		}
+		boolean[] isAlive = new boolean[clients.size()];
+		for (int i = 0; i < clients.size(); ++i) {
+			isAlive[i] = (clients.get(i) != null);
+		}
+
+		System.err.println("Engine entering main game loop");
+
+		int numTurns = 0;
+		int ap = 0; // MODIFIED: active player, based on current numTurns
+		// Enter the main game loop.
+		while (game.Winner() < 0) {
+			// Send the game state to the clients.
+			System.err.println("The game state:");
+			System.err.print(game);
+
+			if (gameMode == GAME_MODE_SERIAL) {
+				// MODIFIED: send game state only to active player (ap)
+				if (clients.get(ap) == null || !game.IsAlive((ap + 1) % 2)) {
+					continue;
 				}
-	    	}
-	    	sendGameState(game, clients, ap);
-	    }
-		
-	    // Get orders from the clients.
-	    StringBuilder[] buffers = new StringBuilder[clients.size()];
-	    boolean[] clientDone = new boolean[clients.size()];
-	    for (int i = 0; i < clients.size(); ++i) {
-		buffers[i] = new StringBuilder();
-		clientDone[i] = false;
-	    }
-	    long startTime = System.currentTimeMillis();
-	    while (!AllTrue(clientDone) &&
-		   System.currentTimeMillis() - startTime < maxTurnTime) {
-	    	
-	    	int i;
-	    	int end;
-	    	if (gameMode == GAME_MODE_SERIAL) {
-	    		// MODIFIED: one player per turn
-	    		i = ap;
-	    		end = ap + 1;
-	    	} else {
-	    		i = 0;
-	    		end = clients.size();
-	    	}
-		for (i = 0 ; i < end; ++i) {
-	    
-	    	
-		    if (!isAlive[i] || !game.IsAlive(i + 1) || clientDone[i]) {
-			clientDone[i] = true;
-			continue;
-		    }
-                    try {
-                        InputStream inputStream =
-                            clients.get(i).getInputStream();
-                        while (inputStream.available() > 0) {
-                            char c = (char)inputStream.read();
-                            if (c == '\n') {
-                                String line = buffers[i].toString().trim();
-                                //System.err.println("P" + (i+1) + ": " + line);
-                                line = line.toLowerCase().trim();
-                                System.err.println("player" + (i + 1) + " > engine: " + line);
-                                // Modified: only process 1 order
-                                game.IssueOrder(i + 1, line);
-                                clientDone[i] = true;
-                                /*
-                                if (line.equals("go")) {
-                                	clientDone[i] = true;
-                                } else {
-                                	game.IssueOrder(i + 1, line);
-                                }
-                                */
-                                buffers[i] = new StringBuilder();
-                                break;
-                            } else {
-                                buffers[i].append(c);
-                            }
-                        }
-                        receiveOrders(clients, i);
-                    } catch (Exception e) {
-			System.err.println("WARNING: player " + (i+1) +
-					   " crashed.");
-			clients.get(i).destroy();
-			game.DropPlayer(i + 1);
-			isAlive[i] = false;
-		    }
+				sendGameState(game, clients, ap);
+			} else {
+				for (int i = 0; i < clients.size(); ++i) {
+					if (clients.get(i) == null || !game.IsAlive((i + 1)%clients.size())) {
+						continue;
+					}
+					sendGameState(game, clients, i);
+				}
+				
+
+			}
+
+			// Get orders from the clients.
+			StringBuilder[] buffers = new StringBuilder[clients.size()];
+			boolean[] clientDone = new boolean[clients.size()];
+			for (int i = 0; i < clients.size(); ++i) {
+				buffers[i] = new StringBuilder();
+				clientDone[i] = false;
+			}
+			long startTime = System.currentTimeMillis();
+			while (!AllTrue(clientDone)
+					&& System.currentTimeMillis() - startTime < maxTurnTime) {
+
+//				int i;
+//				int end;
+//				if (gameMode == GAME_MODE_SERIAL) {
+//					// MODIFIED: one player per turn
+//					i = ap; // gets overridden in for loop
+//					end = ap + 1; // not correct
+//				} else {
+//					i = 0;
+//					end = clients.size();
+//				}
+				
+				for (int i = 0; i < clients.size(); ++i) {
+
+					if (!isAlive[i] || !game.IsAlive(i + 1) || clientDone[i]) {
+						clientDone[i] = true;
+						continue;
+					}
+					
+					// if serial read only the active player
+					if (gameMode == GAME_MODE_SERIAL) {
+						if (i != ap)
+							continue;
+					}
+					
+					// if it's parallel read both
+					try {
+						InputStream inputStream = clients.get(i)
+								.getInputStream();
+						while (inputStream.available() > 0) {
+							char c = (char) inputStream.read();
+							if (c == '\n') {
+								String line = buffers[i].toString().trim();
+								// System.err.println("P" + (i+1) + ": " +
+								// line);
+								line = line.toLowerCase().trim();
+								System.err.println("player" + (i + 1)
+										+ " > engine: " + line);
+								// Modified: only process 1 order
+								game.IssueOrder(i + 1, line);
+								clientDone[i] = true;
+								/*
+								 * if (line.equals("go")) { clientDone[i] =
+								 * true; } else { game.IssueOrder(i + 1, line);
+								 * }
+								 */
+								buffers[i] = new StringBuilder();
+								break;
+							} else {
+								buffers[i].append(c);
+							}
+						}
+						receiveOrders(clients, i);
+					} catch (Exception e) {
+						System.err.println("WARNING: player " + (i + 1)
+								+ " crashed.");
+						clients.get(i).destroy();
+						game.DropPlayer(i + 1);
+						isAlive[i] = false;
+					}
+				}
+			}
+			// MODIFIED: update active player
+			ap = (ap + 1) % 2;
+
+			for (int j = 0; j < clients.size(); ++j) {
+				if (!isAlive[j] || !game.IsAlive(j + 1)) {
+					continue;
+				}
+				if (clientDone[j]) {
+					continue;
+				}
+				// Do NOT drop players at timeouts
+				/*
+				 * System.err.println("WARNING: player " + (i+1) +
+				 * " timed out."); clients.get(i).destroy(); game.DropPlayer(i +
+				 * 1); isAlive[i] = false;
+				 */
+			}
+			++numTurns;
+			System.err.println("Turn " + numTurns);
+			System.out.print(game.FlushGamePlaybackString());
+			System.out.flush();
+			game.DoTimeStep();
+
+			// Keep advancing turns, until there are no ships in flight.
+			// This way each player has complete knowledge of game state on
+			// start
+			while (game.getFleets().size() != 0) {
+				game.skipTimeStep();
+			}
 		}
+		KillClients(clients);
+		if (game.Winner() > 0) {
+			System.err.println("Player " + game.Winner() + " Wins!");
+		} else {
+			System.err.println("Draw!");
 		}
-	    //MODIFIED: update active player
-	    ap = (ap + 1)%2;
-	   
-	    for (int j = 0 ; j < clients.size(); ++j) {
-		if (!isAlive[j] || !game.IsAlive(j + 1)) {
-		    continue;
-		}
-		if (clientDone[j]) {
-		    continue;
-		}
-		// Do NOT drop players at timeouts
-		/*
-		System.err.println("WARNING: player " + (i+1) +
-				   " timed out.");
-		clients.get(i).destroy();
-		game.DropPlayer(i + 1);
-		isAlive[i] = false;
-		*/
-	    }
-	    ++numTurns;
-	    System.err.println("Turn " + numTurns);
-	    System.out.print(game.FlushGamePlaybackString());
-	    System.out.flush();
-	    game.DoTimeStep();
-	    
-	    //Keep advancing turns, until there are no ships in flight. 
-	    //This way each player has complete knowledge of game state on start
-	    while (game.getFleets().size() != 0) {
-		    game.skipTimeStep();
-	    }
-	}
-	KillClients(clients);
-	if (game.Winner() > 0) {
-	    System.err.println("Player " + game.Winner() + " Wins!");
-	} else {
-	    System.err.println("Draw!");
-	}
-	System.out.println(game.GamePlaybackString());
+		System.out.println(game.GamePlaybackString());
 	}
 	
 	

@@ -39,6 +39,16 @@ public class Engine {
 	return true;
     }
 
+    public static boolean clientsDone(boolean[] clientsDone, int gameMode, int playerId) {
+    	if (gameMode == GAME_MODE_PARALLEL) {
+    		return AllTrue(clientsDone);
+    	} else {
+    		return clientsDone[playerId];
+    	}
+    }
+
+
+    
 	public static void main(String[] args) {
 		// Check the command-line arguments.
 		if (args.length < 3 || args.length > 6) {
@@ -155,8 +165,7 @@ public class Engine {
 				clientDone[i] = false;
 			}
 			long startTime = System.currentTimeMillis();
-			while (!AllTrue(clientDone)
-					&& System.currentTimeMillis() - startTime < maxTurnTime) {
+	        while (!clientsDone(clientDone, gameMode, ap) && System.currentTimeMillis() - startTime < maxTurnTime) {
 
 //				int i;
 //				int end;
@@ -197,19 +206,20 @@ public class Engine {
 										+ " > engine: " + line);
 								// Modified: only process 1 order
 								game.IssueOrder(i + 1, line);
-								clientDone[i] = true;
-								/*
-								 * if (line.equals("go")) { clientDone[i] =
-								 * true; } else { game.IssueOrder(i + 1, line);
-								 * }
-								 */
+								//clientDone[i] = true;
+                                if (line.equals("go")) {
+                                	clientDone[i] = true;
+                                } else {
+                                	game.IssueOrder(i + 1, line);
+                                }
+
 								buffers[i] = new StringBuilder();
 								break;
 							} else {
 								buffers[i].append(c);
 							}
 						}
-						receiveOrders(clients, i);
+						printBotDebugOutput(clients, i);
 					} catch (Exception e) {
 						System.err.println("WARNING: player " + (i + 1)
 								+ " crashed.");
@@ -290,7 +300,7 @@ public class Engine {
 		}
     }
     
-    private static void receiveOrders(List<Process> clients, int clientId) throws IOException {
+    private static void printBotDebugOutput(List<Process> clients, int clientId) throws IOException {    	
     	StringBuilder buf = new StringBuilder();
         InputStream stderr = clients.get(clientId).getErrorStream();
         while (stderr.available() > 0){

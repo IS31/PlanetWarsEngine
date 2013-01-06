@@ -339,6 +339,9 @@ public class Game implements Cloneable {
             DropPlayer(playerID);
             return -1;
         }
+        if (sourcePlanet == destinationPlanet) {
+        	WriteLogMessage("Source planets same as destination planet.");
+        }
         source.RemoveShips(numShips);
         int distance = Distance(sourcePlanet, destinationPlanet);
         Fleet f = new Fleet(source.Owner(),
@@ -389,18 +392,21 @@ public class Game implements Cloneable {
     // Returns true if the named player owns at least one planet or fleet.
     // Otherwise, the player is deemed to be dead and false is returned.
     public boolean IsAlive(int playerID) {
-  for (Planet p : planets) {
-      if (p.Owner() == playerID) {
-    return true;
-      }
-  }
-  for (Fleet f : fleets) {
-      if (f.Owner() == playerID) {
-    return true;
-      }
-  }
-  return false;
-    }
+		for (Planet p : planets) {
+			if (p.Owner() == playerID) {
+				return true;
+			}
+		}
+		for (Fleet f : fleets) {
+			if (f.Owner() == playerID) {
+				return true;
+			}
+		}
+		
+		return false;
+		
+		
+	}
 
     // If the game is not yet over (ie: at least two players have planets or
     // fleets remaining), returns -1. If the game is over (ie: only one player
@@ -754,6 +760,10 @@ public class Game implements Cloneable {
   
   public ArrayList<Fleet> getFleets() {
 	  return this.fleets;
+  }
+  
+  public ArrayList<Planet> getPlanets() {
+	  return this.planets;
   }
   
 }

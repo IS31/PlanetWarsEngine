@@ -135,7 +135,7 @@ public class Engine {
 		// Enter the main game loop.
 		while (game.Winner() < 0) {
 			// Send the game state to the clients.
-			System.err.println("The game state:");
+			System.err.println("The game state :");
 			System.err.print(game);
 
 			if (gameMode == GAME_MODE_SERIAL) {
@@ -165,6 +165,8 @@ public class Engine {
 			long startTime = System.currentTimeMillis();
 	        while (!clientsDone(clientDone, gameMode, ap) && System.currentTimeMillis() - startTime < maxTurnTime) {
 
+	        	
+	        	
 //				int i;
 //				int end;
 //				if (gameMode == GAME_MODE_SERIAL) {
@@ -205,16 +207,15 @@ public class Engine {
 										+ " > engine: " + line);
 								System.err.flush();
 								// Modified: only process 1 order
-								game.IssueOrder(i + 1, line);
-								clientDone[i] = true;
-//                                if (line.equals("go")) {
-//                                	clientDone[i] = true;
-//                                } else {
-//                                	game.IssueOrder(i + 1, line);
-//                                }
+                                if (line.equals("go")) {
+        							buffers[i] = new StringBuilder();
+                                } else {
+                                	game.IssueOrder(i + 1, line);
+                                	clientDone[i] = true;
+        							buffers[i] = new StringBuilder();
+    								break;
+                                }
 
-								buffers[i] = new StringBuilder();
-								break;
 							} else {
 								buffers[i].append(c);
 							}
@@ -293,8 +294,7 @@ public class Engine {
 		    OutputStreamWriter writer = new OutputStreamWriter(out);
 		    writer.write(message, 0, message.length());
 		    writer.flush();
-		    //System.err.println("engine > player" + (ap + 1) + ": " +
-			//		 message);
+		    System.err.println("engine > player" + (clientId + 1) +"  : " +  message);
 		} catch (Exception e) {
 		    clients.set(clientId, null);
 		}

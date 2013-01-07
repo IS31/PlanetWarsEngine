@@ -128,16 +128,16 @@ public class Engine {
 			isAlive[i] = (clients.get(i) != null);
 		}
 
-		System.err.println("Engine entering main game loop. Mode "+ gameMode);
+		System.err.println("Engine entering main game loop. Mode '"+ (gameMode == GAME_MODE_PARALLEL? "parallel": "serial") + "'");
 
 		int numTurns = 0;
 		int ap = 0; // MODIFIED: active player, based on current numTurns
 		// Enter the main game loop.
 		while (game.Winner() < 0) {
 			// Send the game state to the clients.
-			System.err.println("The game state :");
-			System.err.print(game);
-
+			//System.err.println("The game state :");
+			//System.err.print(game);
+			game.WriteLogMessage("Game state turn " + numTurns + ": \n" + game);
 			if (gameMode == GAME_MODE_SERIAL) {
 				// MODIFIED: send game state only to active player (ap)
 				if (clients.get(ap) == null || !game.IsAlive((ap + 1) % 2)) {
@@ -207,9 +207,9 @@ public class Engine {
 								// line);
 								line = line.toLowerCase().trim();
 								game.WriteLogMessage("player" + (j + 1) + " > engine: " + line);
-								System.err.println("player" + (j + 1)
-										+ " > engine: " + line);
-								System.err.flush();
+//								System.err.println("player" + (j + 1)
+//										+ " > engine: " + line);
+//								System.err.flush();
 								// Modified: only process 1 order
                                 if (line.equals("go")) {
         							buffers[j] = new StringBuilder();
@@ -298,7 +298,8 @@ public class Engine {
 		    OutputStreamWriter writer = new OutputStreamWriter(out);
 		    writer.write(message, 0, message.length());
 		    writer.flush();
-		    System.err.println("engine > player" + (clientId + 1) +"  : " +  message);
+		    //System.err.println("engine > player" + (clientId + 1) +"  : " +  message);
+		    game.WriteLogMessage("engine > player" + (clientId + 1) +": \n" +  message);
 		} catch (Exception e) {
 		    clients.set(clientId, null);
 		}

@@ -72,13 +72,13 @@ public class Engine {
 			System.err
 					.println("<max_num_turns>:        Maximum number of turns this game may take. Default: 100");
 			System.err
-					.println("<max_turn_time>:        Maximum number of time a bot is allowed to take per turn. Default: 100");
+					.println("<max_turn_time>:        Maximum number of time a bot is allowed to take per turn. Default: 1000");
 			System.exit(1);
 		}
 		// Initialize the game. Load the map.
 		String mapFilename = args[0];
 		int maxNumTurns = 100;
-		int maxTurnTime = 100;
+		int maxTurnTime = 1000;
 		String logFilename = "log.txt";
 		int gameMode = GAME_MODE_SERIAL;
 		// optional arguments

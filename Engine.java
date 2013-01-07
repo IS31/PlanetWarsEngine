@@ -49,6 +49,7 @@ public class Engine {
 
 
     
+	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
 		// Check the command-line arguments.
 		if (args.length < 3 || args.length > 6) {
@@ -123,6 +124,11 @@ public class Engine {
 
 			clients.add(client);
 		}
+		try {
+			Thread.currentThread().sleep(maxTurnTime);
+		} catch (InterruptedException e1) {
+			//pff, nothing
+		}
 		boolean[] isAlive = new boolean[clients.size()];
 		for (int i = 0; i < clients.size(); ++i) {
 			isAlive[i] = (clients.get(i) != null);
@@ -163,9 +169,17 @@ public class Engine {
 				clientDone[i] = false;
 			}
 			long startTime = System.currentTimeMillis();
-	        while (!clientsDone(clientDone, gameMode, ap) && System.currentTimeMillis() - startTime < maxTurnTime) {
+	        while (!clientsDone(clientDone, gameMode, ap) ) {
 
-	        	
+	        	if( System.currentTimeMillis() - startTime > maxTurnTime){
+	        		//check client done
+	        		for (int i = 0; i < clientDone.length; ++i) {
+	        		    if (!clientDone[i]) {
+	        		    	System.err.println("Client " + (ap+1) + " timeout: you missed a turn! Consider to make your bot faster, or increase the maxTurnTime (argument of PlayGame.jar).");
+	        		    }
+	        		}
+	        		break;
+	        	}
 	        	
 //				int i;
 //				int end;

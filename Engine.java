@@ -146,14 +146,14 @@ public class Engine {
 			game.WriteLogMessage("Game state turn " + numTurns + ": \n" + game);
 			if (gameMode == GAME_MODE_SERIAL) {
 				// MODIFIED: send game state only to active player (ap)
-				if (clients.get(ap) == null || !game.IsAlive((ap + 1) % 2)) {
-					continue;
+				if (clients.get(ap) == null ) {
+					break;
 				}
 				sendGameState(game, clients, ap);
 			} else {
 				for (int i = 0; i < clients.size(); ++i) {
-					if (clients.get(i) == null || !game.IsAlive((i + 1)%clients.size())) {
-						continue;
+					if (clients.get(i) == null ) {
+						break;
 					}
 					sendGameState(game, clients, i);
 				}
@@ -196,7 +196,7 @@ public class Engine {
 
 					int j = (ap + i) % 2; // required to switch between whom to start first (not to favouritize player1)
 					
-					if (!isAlive[j] || !game.IsAlive((j + 1)%clients.size()) || clientDone[j]) {
+					if (!isAlive[j] || clientDone[j]) {
 						clientDone[j] = true;
 						continue;
 					}
@@ -265,18 +265,21 @@ public class Engine {
 //				 * 1); isAlive[i] = false;
 //				 */
 //			}
-			++numTurns;
-			System.err.println("Turn " + numTurns);
-			System.out.print(game.FlushGamePlaybackString());
-			System.out.flush();
-			game.DoTimeStep();
-
+			
 			// Keep advancing turns, until there are no ships in flight.
 			// This way each player has complete knowledge of game state on
 			// start
 			while (game.getFleets().size() != 0) {
 				game.skipTimeStep();
 			}
+			
+			++numTurns;
+			System.err.println("Turn " + numTurns);
+			System.out.print(game.FlushGamePlaybackString());
+			System.out.flush();
+			game.DoTimeStep();
+
+
 		}
 		KillClients(clients);
 		if (game.Winner() > 0) {

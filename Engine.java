@@ -17,6 +17,7 @@
 import java.io.*;
 import java.util.*;
 
+
 public class Engine {
 	
 	public static int GAME_MODE_SERIAL = 1;
@@ -200,6 +201,7 @@ public class Engine {
 						clientDone[j] = true;
 						continue;
 					}
+	
 					
 					// if serial read only the active player
 					if (gameMode == GAME_MODE_SERIAL) {
@@ -237,11 +239,20 @@ public class Engine {
 							} else {
 								buffers[j].append(c);
 							}
+							
+							
+							try {
+								printBotDebugOutput(clients, j, numTurns);
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 						}
-						printBotDebugOutput(clients, j);
+
 					} catch (Exception e) {
 						System.err.println("WARNING: player " + (j + 1)
 								+ " crashed.");
+						
 						clients.get(j).destroy();
 						game.DropPlayer(j + 1);
 						isAlive[j] = false;
@@ -322,14 +333,18 @@ public class Engine {
 		}
     }
     
-    private static void printBotDebugOutput(List<Process> clients, int clientId) throws IOException {    	
+    private static void printBotDebugOutput(List<Process> clients, int clientId, int turnNumber) throws IOException {    	
     	StringBuilder buf = new StringBuilder();
-        InputStream stderr = clients.get(clientId).getErrorStream();
+        InputStream in = clients.get(clientId).getErrorStream();
+        BufferedInputStream stderr = new BufferedInputStream (in);
+        
+        
         while (stderr.available() > 0){
             char c = (char)stderr.read();
             if (c == '\n') {
                 String ln = buf.toString();
-                System.err.println("Player " + (clientId+1) + ": " + ln);
+                System.err.println("Player " + (clientId+1) + ": " + ln );
+                System.err.flush();
                 buf = new StringBuilder();
             }
             else {

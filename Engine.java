@@ -230,7 +230,10 @@ public class Engine {
                                 if (line.equals("go")) {
         							buffers[j] = new StringBuilder();
                                 } else {
-                                	game.IssueOrder(j + 1, line);
+                                	int result = game.IssueOrder(j + 1, line);
+                                	if (result == -1) { 
+                                		System.err.println("== player" + (j + 1) + " skipped a turn. Check log file for info. ==");
+                                	}
                                 	clientDone[j] = true;
         							buffers[j] = new StringBuilder();
     								break;

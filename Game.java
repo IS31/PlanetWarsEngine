@@ -326,7 +326,7 @@ public class Game implements Cloneable {
 				WriteLogMessage("ERROR: cannot send more ships than you own. ");
 			}
 			if (numShips <= 0) {
-				WriteLogMessage("ERROR: cannot send a negative number of ships. ");
+				WriteLogMessage("ERROR: cannot send zero or negative number of ships. ");
 			}
 			// WriteLogMessage("Dropping player " + playerID +
 			// ". source.Owner() = " + source.Owner() +

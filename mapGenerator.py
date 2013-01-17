@@ -2,10 +2,18 @@
 
 import math
 import random
-
+import sys
 # minimum and maximum total number of planets in map
 minPlanets = 15
 maxPlanets = 30
+
+if len(sys.argv) == 3:
+    try:
+        minPlanets = int(sys.argv[1])
+        maxPlanets = int(sys.argv[2])
+    except ValueError, TypeError:
+        pass
+    
 # maximum number of planets specifically generated to be equidistant from both
 # players, by chance planet generated in the standard symmetric way could still
 # end up equidistant as well
@@ -13,7 +21,7 @@ maxPlanets = 30
 maxCentral = 5
 # minimum and maximum number of ships on neutral planets
 minShips = 1
-maxShips = 100
+maxShips = 25
 # minimum and maximum growth for planets
 # except for the center planet which is always 0 minimum growth
 minGrowth = 1
@@ -95,7 +103,12 @@ if random.randint(0, 1):
     # can only generate an odd number of planets in this symmetry
     while planetsToGenerate % 2 == 0:
         if planetsToGenerate == maxPlanets:
-            planetsToGenerate = minPlanets
+            if maxPlanets == minPlanets:
+                #otherwise will cause loop.
+                symmetryType = -1
+                break
+            else :
+                planetsToGenerate = minPlanets
         else:
             planetsToGenerate += 1
 else:

@@ -262,6 +262,8 @@ public class Game implements Cloneable {
 			gamePlayback.append(".");
 			gamePlayback.append(f.TurnsRemaining());
 		}
+		gamePlayback.append(";"); //added for logging turns - Melvin
+		gamePlayback.append(numTurns); //added for logging turns - Melvin
 		gamePlayback.append(":");
 		// Check to see if the maximum number of turns has been reached.
 		++numTurns;
@@ -301,6 +303,8 @@ public class Game implements Cloneable {
 			gamePlayback.append(".");
 			gamePlayback.append(f.TurnsRemaining());
 		}
+		gamePlayback.append(";"); //added for logging turns - Melvin
+		gamePlayback.append(numTurns); //added for logging turns - Melvin
 		gamePlayback.append(":");
 	}
 

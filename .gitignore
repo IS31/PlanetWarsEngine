@@ -5,3 +5,5 @@
 .project
 .pydevproject
 maps
+*.txt
+*~

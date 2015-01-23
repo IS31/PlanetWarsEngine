@@ -1,0 +1,3 @@
+[submodule "tools/Planet-Wars-Canvas-Visualizer"]
+	path = tools/Planet-Wars-Canvas-Visualizer
+	url = git@github.com:DanielVF/Planet-Wars-Canvas-Visualizer.git

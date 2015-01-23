@@ -1,40 +1,51 @@
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 
 /* A bit smarter kind of bot, who searches for its strongest planet and then attacks the weakest planet.
- The score is computed based on the number of ships and the inverse of the growth rate.
+ The score is computed based on the number of ships.
  */
 
 public class BullyBot {
 	public static void DoTurn(PlanetWars pw) {
-
 		// (1) Find my strongest planet.
 		Planet source = null;
-		System.err.println("This is BullyBot! I Came, I saw, I bullied, I won... ;-) ");
 		double sourceScore = Double.MIN_VALUE;
 		for (Planet myPlanet : pw.MyPlanets()) {
+			// skip planets with only one ship
+			if (myPlanet.NumShips() <= 1)
+				continue;
+			
 			//This score is one way of defining how 'good' my planet is. 
-			double score = (double) myPlanet.NumShips() / (1 + myPlanet.GrowthRate());
+			double score = (double) myPlanet.NumShips();
+			
 			if (score > sourceScore) {
 				//we want to maximize the score, so store the planet with the best score
 				sourceScore = score;
 				source = myPlanet;
 			}
 		}
+		
 		// (2) Find the weakest enemy or neutral planet.
 		Planet dest = null;
-		double destScore = Double.MIN_VALUE;
-		for (Planet notMyPlanets : pw.NotMyPlanets()) {
-			//This score is one way of defining how 'bad' the other planet is. 
-			double score = (double) (1 + notMyPlanets.GrowthRate()) / notMyPlanets.NumShips();
-			if (score > destScore) {
-				//The way the score is defined, is that the weaker a plannet is, the higher the score. 
-				//So again, we want to select the planet with the best score
+		double destScore = Double.MAX_VALUE;
+		for (Planet notMyPlanet : pw.NotMyPlanets()) {
+			//This score is one way of defining how 'good' the planet is. 
+			// You can change it to something different and experiment with it.
+			double score = (double) (notMyPlanet.NumShips());
+			//if you want to debug how the score is computed, decomment the System.err.instructions
+//			System.err.println("Planet: " +notMyPlanet.PlanetID()+ " Score: "+ score);
+//			System.err.flush();
+			if (score < destScore) {
+				//We want to select the planet with the lowest score
 				destScore = score;
-				dest = notMyPlanets;
+				dest = notMyPlanet;
 			}
 		}
+		
 		// (3) Attack!
 		if (source != null && dest != null) {
+			System.err.println("ORDER " + source.PlanetID() + " " + dest.PlanetID());
 			pw.IssueOrder(source, dest);
 		}
 	}
@@ -63,7 +74,11 @@ public class BullyBot {
 				}
 			}
 		} catch (Exception e) {
-			// Owned.
+			StringWriter writer = new StringWriter();
+			e.printStackTrace(new PrintWriter(writer));
+			String stackTrace = writer.toString();
+			System.err.println(stackTrace);
+			System.exit(1); //just stop now. we've got a problem
 		}
 	}
 }

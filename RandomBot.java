@@ -1,3 +1,5 @@
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.*;
 
 /*
@@ -17,7 +19,7 @@ public class RandomBot {
 
 		// (0) Create a random number generator
 		Random random = new Random();
-		System.err.println("Err... RandomBot moving out... Bleep Bleep Bleep :)");
+
 		// (1) Pick one of my planets at random.
 		Planet source = null;
 
@@ -26,7 +28,6 @@ public class RandomBot {
 
 		// (1b) If the list is not empty:
 		if (myPlanets.size() > 0) {
-
 			// (1c) Pick a random integer in [0, number_of_my_planets]
 			Integer randomSource = random.nextInt(myPlanets.size());
 
@@ -37,12 +38,9 @@ public class RandomBot {
 		// (2) Pick a target planet at random
 		Planet dest = null;
 
-		// (2a) Take the list of all planets
-		List<Planet> allPlanets = pw.Planets();
+		// (2a) Take the list of not my planets
+		List<Planet> allPlanets = pw.NotMyPlanets();
 
-		// Remove our 'source' planet from the list: using the same planet as 'source' and 'dest' is an invalid turn.
-		// As a result, you will skip this turn without any action.
-		allPlanets.remove(source);
 		if (allPlanets.size() > 0) {
 
 			// (2b) Pick a random integer in [0, number_of_all_planets]
@@ -54,6 +52,7 @@ public class RandomBot {
 
 		// (3) Send half the ships from source to destination
 		if (source != null && dest != null) {
+			System.err.println("ORDER " + source.PlanetID() + " " + dest.PlanetID());
 			pw.IssueOrder(source, dest);
 		}
 	}
@@ -82,7 +81,11 @@ public class RandomBot {
 				}
 			}
 		} catch (Exception e) {
-
+			StringWriter writer = new StringWriter();
+			e.printStackTrace(new PrintWriter(writer));
+			String stackTrace = writer.toString();
+			System.err.println(stackTrace);
+			System.exit(1); //just stop now. we've got a problem
 		}
 	}
 }

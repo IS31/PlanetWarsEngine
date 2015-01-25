@@ -11,13 +11,13 @@ import java.io.*;
 
 
 public class PlanetWars {
-    // Constructs a PlanetWars object instance, given a string containing a
-    // description of a game state.
-    public PlanetWars(String gameStateString) {
-	planets = new ArrayList<Planet>();
-	fleets = new ArrayList<Fleet>();
-	ParseGameState(gameStateString);
-    }
+	// Constructs a PlanetWars object instance, given a string containing a
+	// description of a game state.
+	public PlanetWars(String gameStateString) {
+		planets = new ArrayList < Planet > ();
+		fleets = new ArrayList < Fleet > ();
+		ParseGameState(gameStateString);
+	}
 
 	// Returns the number of planets. Planets are numbered starting with 0.
 	public int NumPlanets() {
@@ -43,15 +43,15 @@ public class PlanetWars {
 	}
 
 	// Returns a list of all the planets.
-	public List<Planet> Planets() {
+	public List < Planet > Planets() {
 		return planets;
 	}
 
 	// Return a list of all the planets owned by the current player. By
 	// convention, the current player is always player number 1.
-	public List<Planet> MyPlanets() {
-		List<Planet> r = new ArrayList<Planet>();
-		for (Planet p : planets) {
+	public List < Planet > MyPlanets() {
+		List < Planet > r = new ArrayList < Planet > ();
+		for (Planet p: planets) {
 			if (p.Owner() == 1) {
 				r.add(p);
 			}
@@ -60,9 +60,9 @@ public class PlanetWars {
 	}
 
 	// Return a list of all neutral planets.
-	public List<Planet> NeutralPlanets() {
-		List<Planet> r = new ArrayList<Planet>();
-		for (Planet p : planets) {
+	public List < Planet > NeutralPlanets() {
+		List < Planet > r = new ArrayList < Planet > ();
+		for (Planet p: planets) {
 			if (p.Owner() == 0) {
 				r.add(p);
 			}
@@ -72,9 +72,9 @@ public class PlanetWars {
 
 	// Return a list of all the planets owned by rival players. This excludes
 	// planets owned by the current player, as well as neutral planets.
-	public List<Planet> EnemyPlanets() {
-		List<Planet> r = new ArrayList<Planet>();
-		for (Planet p : planets) {
+	public List < Planet > EnemyPlanets() {
+		List < Planet > r = new ArrayList < Planet > ();
+		for (Planet p: planets) {
 			if (p.Owner() >= 2) {
 				r.add(p);
 			}
@@ -83,45 +83,45 @@ public class PlanetWars {
 	}
 
 	public class PlanetKey {
-		  Integer key;
-		  Planet planet;
-		  PlanetKey(Integer key, Planet planet){
-			  this.key=key;
-			  this.planet=planet;
-		  }
-		
-	public class MyPlanetKeyComparable implements Comparator<PlanetKey>{
-		    public int compare(PlanetKey o1, PlanetKey o2) {
-		        return (o1.key>o2.key ? -1 : (o1.key==o2.key ? 0 : 1));
-		    }
+		Integer key;
+		Planet planet;
+		PlanetKey(Integer key, Planet planet) {
+			this.key = key;
+			this.planet = planet;
+		}
+	}
+
+	public class MyPlanetKeyComparable implements Comparator < PlanetKey > {
+		public int compare(PlanetKey o1, PlanetKey o2) {
+			return (o1.key > o2.key ? -1 : (o1.key == o2.key ? 0 : 1));
+		}
 	}
 	// Return a list of n planets that are not owned near a 
 	// owned one. This includes all enemy planets and neutral planets.
-	public List<Planet> NeighborsPlanets(Planet planet, int number) {
-		List<Planet> notMyPlanets = NotMyPlanets();
-		if (number>notMyPlanets.size()) 
-			return notMyPlanets;
-		List<PlanetKey> planetKey = new ArrayList<PlanetKey>();
-		List<Planet> result = new ArrayList<Planet>();
-		List<Integer> distances = new ArrayList<Integer>();
-		for (Planet p : notMyPlanets) {
-			PlanetKey aux = new PlanetKey(Distance(planet,p),planet);
+	public List < Planet > NeighborsPlanets(Planet planet, int number) {
+		List < Planet > notMyPlanets = NotMyPlanets();
+		if (number > notMyPlanets.size()) return notMyPlanets;
+		List < PlanetKey > planetKey = new ArrayList < PlanetKey > ();
+		List < Planet > result = new ArrayList < Planet > ();
+		List < Integer > distances = new ArrayList < Integer > ();
+		for (Planet p: notMyPlanets) {
+			PlanetKey aux = new PlanetKey(Distance(planet, p), planet);
 			planetKey.add(aux);
 		}
-		List<Integer> distancesKeys = new ArrayList<Integer>(distances);
+		List < Integer > distancesKeys = new ArrayList < Integer > (distances);
 		Collections.sort(planetKey, new MyPlanetKeyComparable());
-		for (int i=0; i<=number; i++) {
+		for (int i = 0; i <= number; i++) {
 			result.add(planetKey.get(i).planet);
 		}
 		return result;
 	}
-	
-	
+
+
 	// Return a list of all the planets that are not owned by the current
 	// player. This includes all enemy planets and neutral planets.
-	public List<Planet> NotMyPlanets() {
-		List<Planet> r = new ArrayList<Planet>();
-		for (Planet p : planets) {
+	public List < Planet > NotMyPlanets() {
+		List < Planet > r = new ArrayList < Planet > ();
+		for (Planet p: planets) {
 			if (p.Owner() != 1) {
 				r.add(p);
 			}
@@ -130,18 +130,18 @@ public class PlanetWars {
 	}
 
 	// Return a list of all the fleets.
-	public List<Fleet> Fleets() {
-		List<Fleet> r = new ArrayList<Fleet>();
-		for (Fleet f : fleets) {
+	public List < Fleet > Fleets() {
+		List < Fleet > r = new ArrayList < Fleet > ();
+		for (Fleet f: fleets) {
 			r.add(f);
 		}
 		return r;
 	}
 
 	// Return a list of all the fleets owned by the current player.
-	public List<Fleet> MyFleets() {
-		List<Fleet> r = new ArrayList<Fleet>();
-		for (Fleet f : fleets) {
+	public List < Fleet > MyFleets() {
+		List < Fleet > r = new ArrayList < Fleet > ();
+		for (Fleet f: fleets) {
 			if (f.Owner() == 1) {
 				r.add(f);
 			}
@@ -150,9 +150,9 @@ public class PlanetWars {
 	}
 
 	// Return a list of all the fleets owned by enemy players.
-	public List<Fleet> EnemyFleets() {
-		List<Fleet> r = new ArrayList<Fleet>();
-		for (Fleet f : fleets) {
+	public List < Fleet > EnemyFleets() {
+		List < Fleet > r = new ArrayList < Fleet > ();
+		for (Fleet f: fleets) {
 			if (f.Owner() != 1) {
 				r.add(f);
 			}
@@ -168,13 +168,13 @@ public class PlanetWars {
 		Planet destination = planets.get(destinationPlanet);
 		double dx = source.X() - destination.X();
 		double dy = source.Y() - destination.Y();
-		return (int)Math.ceil(Math.sqrt(dx * dx + dy * dy));
+		return (int) Math.ceil(Math.sqrt(dx * dx + dy * dy));
 	}
-	
+
 	public int Distance(Planet source, Planet destination) {
 		double dx = source.X() - destination.X();
 		double dy = source.Y() - destination.Y();
-		return (int)Math.ceil(Math.sqrt(dx * dx + dy * dy));
+		return (int) Math.ceil(Math.sqrt(dx * dx + dy * dy));
 	}
 
 	// Sends an order to the game engine. An order is composed of a source
@@ -220,12 +220,12 @@ public class PlanetWars {
 	// Returns true if the named player owns at least one planet or fleet.
 	// Otherwise, the player is deemed to be dead and false is returned.
 	public boolean IsAlive(int playerID) {
-		for (Planet p : planets) {
+		for (Planet p: planets) {
 			if (p.Owner() == playerID) {
 				return true;
 			}
 		}
-		for (Fleet f : fleets) {
+		for (Fleet f: fleets) {
 			if (f.Owner() == playerID) {
 				return true;
 			}
@@ -238,18 +238,18 @@ public class PlanetWars {
 	// is left) then that player's number is returned. If there are no
 	// remaining players, then the game is a draw and 0 is returned.
 	public int Winner() {
-		Set<Integer> remainingPlayers = new TreeSet<Integer>();
-		for (Planet p : planets) {
+		Set < Integer > remainingPlayers = new TreeSet < Integer > ();
+		for (Planet p: planets) {
 			remainingPlayers.add(p.Owner());
 		}
-		for (Fleet f : fleets) {
+		for (Fleet f: fleets) {
 			remainingPlayers.add(f.Owner());
 		}
 		switch (remainingPlayers.size()) {
 		case 0:
 			return 0;
 		case 1:
-			return ((Integer)remainingPlayers.toArray()[0]).intValue();
+			return ((Integer) remainingPlayers.toArray()[0]).intValue();
 		default:
 			return -1;
 		}
@@ -259,12 +259,12 @@ public class PlanetWars {
 	// on planets or in flight.
 	public int NumShips(int playerID) {
 		int numShips = 0;
-		for (Planet p : planets) {
+		for (Planet p: planets) {
 			if (p.Owner() == playerID) {
 				numShips += p.NumShips();
 			}
 		}
-		for (Fleet f : fleets) {
+		for (Fleet f: fleets) {
 			if (f.Owner() == playerID) {
 				numShips += f.NumShips();
 			}
@@ -338,17 +338,15 @@ public class PlanetWars {
 	private int LoadMapFromFile(String mapFilename) {
 		String s = "";
 		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new FileReader(mapFilename));
-			int c;
-			while ((c = in.read()) >= 0) {
-				s += (char)c;
-			}
+		try { in = new BufferedReader(new FileReader(mapFilename));
+		int c;
+		while ((c = in .read()) >= 0) {
+			s += (char) c;
+		}
 		} catch (Exception e) {
 			return 0;
 		} finally {
-			try {
-				in.close();
+			try { in .close();
 			} catch (Exception e) {
 				// Fucked.
 			}
@@ -358,10 +356,10 @@ public class PlanetWars {
 
 	// Store all the planets and fleets. OMG we wouldn't wanna lose all the
 	// planets and fleets, would we!?
-	private ArrayList<Planet> planets;
-	private ArrayList<Fleet> fleets;
+	private ArrayList < Planet > planets;
+	private ArrayList < Fleet > fleets;
 
-	public void log(Object... args) {
+	public void log(Object...args) {
 		String output = "";
 		for (Object arg: args) {
 			output += arg + " ";
@@ -370,7 +368,7 @@ public class PlanetWars {
 	}
 	public String toString() {
 		StringBuilder s = new StringBuilder();
-		for (Planet p : planets) {
+		for (Planet p: planets) {
 			// We can't use String.format here because in certain locales, the ,
 			// and . get switched for X and Y (yet just appending them using the
 			// default toString methods apparently doesn't switch them?)
@@ -380,6 +378,3 @@ public class PlanetWars {
 		return s.toString();
 	}
 }
-
-
-

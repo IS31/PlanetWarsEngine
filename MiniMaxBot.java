@@ -1,32 +1,33 @@
 import java.io.PrintWriter;
 import java.io.StringWriter;
 public class MiniMaxBot {
-	public static class Obj {
-		double score = Double.MIN_VALUE;
+	public static class Planets {
 		Planet source = null;
 		Planet dest = null;
 	}
 	public static void DoTurn(PlanetWars pw) {
-		Obj obj = miniMaxDecision(createSimulation(pw), pw.NeutralPlanets().size() / 2);
-		if (obj.source != null && obj.dest != null) {
-			pw.IssueOrder(obj.source, obj.dest);
+		Planets planets = miniMax(createSimulation(pw), pw.NumPlanets() / 2);
+		if (planets.source != null && planets.dest != null) {
+			pw.IssueOrder(planets.source, planets.dest);
 		}
 	}
-	public static Obj miniMaxDecision(SimulatedPlanetWars pw, int depth) {
-		Obj obj = new Obj();
+	public static Planets miniMax(SimulatedPlanetWars pw, int depth) {
+		Planets planets = new Planets();
+		double score = Double.MIN_VALUE;
 		depth = (depth % 2 == 0) ? depth + 1 : depth;
+		depth = (depth < 2) ? 2 : depth;
 		for (Planet source: pw.MyPlanets()) {
 			for (Planet dest: pw.NotMyPlanets()) {
 				SimulatedPlanetWars simpw = simResult(pw, source, dest);
 				double scoreMax = minimaxValue(simpw, depth - 1);
-				if (scoreMax > obj.score) {
-					obj.score = scoreMax;
-					obj.source = source;
-					obj.dest = dest;
+				if (scoreMax > score) {
+					score = scoreMax;
+					planets.source = source;
+					planets.dest = dest;
 				}
 			}
 		}
-		return obj;
+		return planets;
 	}
 	public static double minimaxValue(SimulatedPlanetWars pw, int depth) {
 		if (depth == 0) {
@@ -95,8 +96,7 @@ public class MiniMaxBot {
 		}
 	}
 	public static SimulatedPlanetWars createSimulation(PlanetWars pw) {
-		SimulatedPlanetWars pippo = new SimulatedPlanetWars(pw);
-		return pippo;
+		SimulatedPlanetWars result = new SimulatedPlanetWars(pw);
+		return result;
 	}
-	static MiniMaxBot dummyBot = new MiniMaxBot();
 }

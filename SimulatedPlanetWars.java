@@ -85,7 +85,7 @@ public class SimulatedPlanetWars {
 		}
 		return r;
 	}
-/*	public class PlanetKey {
+	public class PlanetKey {
 		Integer key;
 		Planet planet;
 		PlanetKey(Integer key, Planet planet) {
@@ -106,18 +106,18 @@ public class SimulatedPlanetWars {
 		if (number > notMyPlanets.size()) return notMyPlanets;
 		List < PlanetKey > planetKey = new ArrayList < PlanetKey > ();
 		List < Planet > result = new ArrayList < Planet > ();
-		List < Integer > distances = new ArrayList < Integer > ();
+
 		for (Planet p: notMyPlanets) {
 			PlanetKey aux = new PlanetKey(Distance(planet, p), planet);
 			planetKey.add(aux);
 		}
-		List < Integer > distancesKeys = new ArrayList < Integer > (distances);
+
 		Collections.sort(planetKey, new MyPlanetKeyComparable());
 		for (int i = 0; i <= number; i++) {
 			result.add(planetKey.get(i).planet);
 		}
 		return result;
-	}*/
+	}
 	public List < Planet > NotMyPlanets() {
 		List < Planet > r = new ArrayList < Planet > ();
 		for (Planet p: planets) {
@@ -135,6 +135,11 @@ public class SimulatedPlanetWars {
 			}
 		}
 		return r;
+	}
+	public int Distance(Planet source, Planet destination) {
+		double dx = source.X() - destination.X();
+		double dy = source.Y() - destination.Y();
+		return (int) Math.ceil(Math.sqrt(dx * dx + dy * dy));
 	}
 	public int Distance(int sourcePlanet, int destinationPlanet) {
 		Planet source = planets.get(sourcePlanet);
